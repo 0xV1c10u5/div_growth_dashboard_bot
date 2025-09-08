@@ -7,3 +7,10 @@ services:
     ports:
       - "8000:8000"
 
+  playwright:
+    build:
+      context: ./playwright
+      dockerfile: Dockerfile
+    volumes:
+      - ./playwright:/scraper
+
