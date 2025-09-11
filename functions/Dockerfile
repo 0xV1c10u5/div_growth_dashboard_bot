@@ -2,7 +2,7 @@
 FROM python:3.11-slim
 
 # Set working directory inside container
-WORKDIR /app
+# WORKDIR /app
 
 # Install yfinance
 RUN pip install --no-cache-dir yfinance

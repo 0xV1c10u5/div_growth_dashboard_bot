@@ -15,5 +15,4 @@ services:
       - ./playwright:/scraper
 
   population:
-    build:
-    command: python3 population.py
+   build: .
