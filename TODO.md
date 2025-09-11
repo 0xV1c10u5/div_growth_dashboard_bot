@@ -1,4 +1,5 @@
 # To Do
+- Apple Silicon containers (just for compatibility)
 - Embedded tableau/grafana?
 - Containerized Langchain Summary bot
 - MVP Dividend Algo
