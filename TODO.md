@@ -1,5 +1,6 @@
 # To Do
 - Switch to Flask?
+- Functions/features are all over the place, consolidate to one...
 - Apple Silicon containers (just for compatibility)
 - Embedded tableau/grafana?
 - Containerized Langchain Summary bot
