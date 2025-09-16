@@ -1,5 +1,21 @@
 ## Custom
-.conf
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# SQLite database
+db/app.db
+
+# Virtual environments
+venv/
+.env
+
+# Docker
+*.log
+*.pid
+*.swp
 
 ## Python Boilerplate
 # Byte-compiled / optimized / DLL files
