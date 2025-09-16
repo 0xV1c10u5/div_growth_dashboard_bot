@@ -1,3 +1,4 @@
+import os
 import dash
 from dash import html
 from dash.dependencies import Input, Output
@@ -7,8 +8,11 @@ from sqlalchemy.orm import sessionmaker
 import signal
 import sys
 
+# Ensure data folder exists
+os.makedirs("./data", exist_ok=True)
+
 # Database setup
-DATABASE_URL = "sqlite:///database.db"
+DATABASE_URL = "sqlite:///./data/database.db"
 engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
 SessionLocal = sessionmaker(bind=engine)
 Base = declarative_base()
@@ -21,11 +25,8 @@ class Visit(Base):
 Base.metadata.create_all(bind=engine)
 
 # Dash app
-app = dash.Dash(
-    __name__,
-    serve_locally=True  # ensures JS/CSS assets are served from container
-)
-server = app.server  # WSGI callable for Gunicorn
+app = dash.Dash(__name__, serve_locally=True)
+server = app.server
 
 app.layout = html.Div([
     html.H1("Hello Dash + SQLAlchemy + Docker + Gunicorn!"),

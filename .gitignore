@@ -6,7 +6,7 @@ __pycache__/
 *.pyd
 
 # SQLite database
-db/app.db
+data/*
 
 # Virtual environments
 .env

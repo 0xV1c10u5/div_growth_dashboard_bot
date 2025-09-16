@@ -15,8 +15,8 @@ RUN pip install --no-cache-dir poetry
 
 WORKDIR /app
 
-# Copy dependency files first for caching
-COPY pyproject.toml poetry.lock* /app/
+# Copy dependency files first (for caching)
+COPY pyproject.toml poetry.lock /app/
 
 # Install dependencies
 RUN poetry config virtualenvs.create false \
@@ -30,11 +30,11 @@ WORKDIR /app
 # Runtime dependencies only
 RUN apk add --no-cache bash libffi
 
-# Copy installed dependencies from builder
+# Copy installed dependencies
 COPY --from=builder /usr/local/lib/python3.12/site-packages /usr/local/lib/python3.12/site-packages
 COPY --from=builder /usr/local/bin /usr/local/bin
 
-# Copy app code
+# Copy application code
 COPY app.py /app/
 
 # Expose Dash port

@@ -17,15 +17,20 @@ fi
 echo "Building Docker image for local platform: $PLATFORM"
 docker buildx build --platform $PLATFORM -t $IMAGE_NAME --load .
 
-# Remove existing container
+# Ensure local data folder exists for persistence
+mkdir -p ./data
+
+# Remove existing container if exists
 if [ "$(docker ps -aq -f name=^/${APP_NAME}$)" ]; then
-    echo "Container $APP_NAME already exists. Removing..."
+    echo "Removing existing container..."
     docker rm -f $APP_NAME
 fi
 
-# Run container in background
+# Run container with data folder mounted
 echo "Starting container..."
-docker run --name $APP_NAME -p 8050:8050 $IMAGE_NAME &
+docker run --name $APP_NAME -p 8050:8050 \
+    -v $(pwd)/data:/app/data \
+    $IMAGE_NAME &
 
 CONTAINER_PID=$!
 echo "Dash app running in Docker (Gunicorn). Press Ctrl+C to stop..."
