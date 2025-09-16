@@ -1,49 +1,36 @@
-#!/usr/bin/env bash
-set -e
+#!/bin/bash
 
-# Auto-install Poetry if missing (native host)
-if ! command -v poetry >/dev/null 2>&1; then
-    echo "Poetry not found. Installing..."
-    curl -sSL https://install.python-poetry.org | python3 -
-    export PATH="$HOME/.local/bin:$PATH"
+APP_NAME="dash_app_container"
+IMAGE_NAME="dash_app_image"
+
+# Build Docker image
+echo "Building Docker image..."
+docker build -t $IMAGE_NAME .
+
+# Remove existing container if it exists
+if [ "$(docker ps -aq -f name=^/${APP_NAME}$)" ]; then
+    echo "Container $APP_NAME already exists. Removing..."
+    docker rm -f $APP_NAME
 fi
 
-# Load .env if present
-[ -f .env ] && export $(grep -v '^#' .env | xargs)
+# Run container in background
+echo "Starting container..."
+docker run --name $APP_NAME -p 8050:8050 $IMAGE_NAME &
 
-# Ensure project root
-cd "$(dirname "$0")"
+CONTAINER_PID=$!
 
-# Create SQLite db directory
-mkdir -p db
+echo "Dash app running in Docker (Gunicorn). Press Ctrl+C to stop..."
 
-# Defaults
-FLASK_APP="${FLASK_APP:-app.py}"
-FLASK_ENV="${FLASK_ENV:-development}"
-FLASK_RUN_HOST="${FLASK_RUN_HOST:-0.0.0.0}"
-FLASK_RUN_PORT="${FLASK_RUN_PORT:-5000}"
-
-DOCKER_IMAGE_NAME="${DOCKER_IMAGE_NAME:-flask-sqlite-app}"
-DOCKER_CONTAINER_NAME="${DOCKER_CONTAINER_NAME:-flask_app_container}"
-DOCKER_PORT_MAPPING="${DOCKER_PORT_MAPPING:-$FLASK_RUN_PORT:$FLASK_RUN_PORT}"
-DOCKER_VOLUME_MAPPING="${DOCKER_VOLUME_MAPPING:-$(pwd)/db:/usr/src/app/db}"
-DOCKER_DETACHED="${DOCKER_DETACHED:-false}"
-
-# Run Flask natively via Poetry
-run_flask_natively() {
-    echo "Running Flask natively with Poetry..."
-    poetry run flask run --host "$FLASK_RUN_HOST" --port "$FLASK_RUN_PORT"
+# Handle Ctrl+C
+cleanup() {
+    echo ""
+    echo "Stopping container..."
+    docker stop $APP_NAME
+    echo "Removing container..."
+    docker rm $APP_NAME
+    exit 0
 }
 
-# Run Flask inside Docker
-run_flask_in_docker() {
-    echo "Docker detected! Running Flask inside Docker..."
-    docker build -t "$DOCKER_IMAGE_NAME" .
-    DOCKER_RUN_OPTS="-p $DOCKER_PORT_MAPPING -v $DOCKER_VOLUME_MAPPING --name $DOCKER_CONTAINER_NAME"
-    [ "$DOCKER_DETACHED" = "true" ] && DOCKER_RUN_OPTS="$DOCKER_RUN_OPTS -d" || DOCKER_RUN_OPTS="$DOCKER_RUN_OPTS --rm -it"
-    docker run $DOCKER_RUN_OPTS "$DOCKER_IMAGE_NAME"
-}
-
-# Detect Docker
-command -v docker >/dev/null 2>&1 && run_flask_in_docker || run_flask_natively
+trap cleanup SIGINT
+wait $CONTAINER_PID
 

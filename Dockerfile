@@ -1,29 +1,30 @@
+# Use official Python image
 FROM python:3.12-slim
 
-# Install system dependencies for Poetry
-RUN apt-get update && apt-get install -y curl build-essential
+WORKDIR /app
 
 # Install Poetry
-ENV POETRY_HOME="/opt/poetry"
-ENV PATH="$POETRY_HOME/bin:$PATH"
+RUN pip install --no-cache-dir poetry
 
-RUN curl -sSL https://install.python-poetry.org | python3 -
+# Copy only dependency files for caching
+COPY pyproject.toml poetry.lock* /app/
 
-WORKDIR /usr/src/app
+# Install dependencies (Poetry 2.x syntax)
+RUN poetry config virtualenvs.create false \
+    && poetry install --no-root --without dev
 
-# Copy project files
-COPY pyproject.toml poetry.lock* ./
-COPY . .
+# Copy application code
+COPY . /app
 
-# Install dependencies with Poetry
-RUN poetry install --no-root --without dev
+# Expose Dash port
+EXPOSE 8050
 
-# Make run.sh executable
-RUN chmod +x run.sh
-
-EXPOSE 5000
-VOLUME ["/usr/src/app/db"]
-
-# Unified entry point
-CMD ["./run.sh"]
+# Run Gunicorn with preload + async threads
+CMD ["gunicorn", "app:server", \
+     "--bind", "0.0.0.0:8050", \
+     "--workers", "2", \
+     "--threads", "4", \
+     "--timeout", "120", \
+     "--preload", \
+     "--worker-class", "gthread"]
 

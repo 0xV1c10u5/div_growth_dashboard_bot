@@ -1,14 +1,18 @@
 [tool.poetry]
-name = "flask-app"
+name = "my_dash_app"
 version = "0.1.0"
-description = ""
+description = "Dash + Flask + SQLite example"
 authors = ["0xV1c10u5 <206298950+0xV1c10u5@users.noreply.github.com>"]
 readme = "README.md"
+packages = [{ include = "my_dash_app" }]
 
 [tool.poetry.dependencies]
 python = "^3.12"
-flask = "^3.1.2"
-python-dotenv = "^1.0"
+dash = "^2.11.0"
+Flask = "^2.2"
+Flask-SQLAlchemy = "^3.0"
+pandas = "^2.0"  # optional, used for small convenience
+gunicorn = "^23.0.0"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^7.0"
@@ -16,3 +20,4 @@ pytest = "^7.0"
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
