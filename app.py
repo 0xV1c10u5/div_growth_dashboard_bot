@@ -20,8 +20,11 @@ class Visit(Base):
 
 Base.metadata.create_all(bind=engine)
 
-# Initialize Dash app
-app = dash.Dash(__name__)
+# Dash app
+app = dash.Dash(
+    __name__,
+    serve_locally=True  # ensures JS/CSS assets are served from container
+)
 server = app.server  # WSGI callable for Gunicorn
 
 app.layout = html.Div([
@@ -43,7 +46,7 @@ def add_visit(n_clicks):
     session.close()
     return f"Total visits: {count}"
 
-# Graceful shutdown for local runs (Gunicorn handles SIGTERM automatically)
+# Graceful shutdown
 def handle_sigint(signal_received, frame):
     print("SIGINT received, shutting down gracefully...")
     sys.exit(0)

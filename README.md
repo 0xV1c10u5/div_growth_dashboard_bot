@@ -5,14 +5,16 @@ Automated Quant Focused on Dividend Growth Gordon Growth w/Dashboard, Scraper, a
 - <s>Switch to Flask?</s>
 - <s>Add Poetry</s>
 - <s>Functions/features are all over the place, consolidate to one...</s>
-- <s>Embedded tableau/grafana?</s> -- Dash/Plotly
-- Containerized Langchain Summary bot
+- <s>Embedded tableau/grafana? -- Dash/Plotly</s>
+- <s>Add graceful shutdown script</s>
+
+- conf file prompt/auto-creation
 - MVP Dividend Algo
 - Add Backtesting
 - MVP Dashboard
-- Add Advanced Features
-- conf file prompt/auto-creation
-- Apple Silicon containers (just for compatibility) -- add multi-stage build instead, perhaps within script
+- Add Advanced Features (Performance Tracking, Industry Distribution, Regression)
+- Langchain Summary bot
+- <s>Apple Silicon containers (just for compatibility) -- add multi-stage build instead, perhaps within script</s>
 
 
 ## Why?
