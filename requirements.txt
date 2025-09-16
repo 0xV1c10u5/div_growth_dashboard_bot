@@ -1,4 +1,0 @@
-flask==2.3.5
-pytest-playwright
-gunicorn
-

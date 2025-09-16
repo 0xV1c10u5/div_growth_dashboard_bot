@@ -16,7 +16,7 @@ COPY pyproject.toml poetry.lock* ./
 COPY . .
 
 # Install dependencies with Poetry
-RUN poetry install --no-root --no-dev
+RUN poetry install --no-root --without dev
 
 # Make run.sh executable
 RUN chmod +x run.sh

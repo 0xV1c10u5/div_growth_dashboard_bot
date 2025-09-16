@@ -3,6 +3,7 @@ Automated Quant Focused on Dividend Growth Gordon Growth w/Dashboard, Scraper, a
 
 ### To Do
 - Add Poetry
+- Add optional -native flag
 - <s>Switch to Flask?</s>
 - <s>Functions/features are all over the place, consolidate to one...</s>
 - Apple Silicon containers (just for compatibility)
