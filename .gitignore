@@ -9,13 +9,17 @@ __pycache__/
 db/app.db
 
 # Virtual environments
-venv/
 .env
+.venv/
 
-# Docker
+# Poetry
+poetry.lock
+
+# Docker & logs
 *.log
 *.pid
 *.swp
+
 
 ## Python Boilerplate
 # Byte-compiled / optimized / DLL files

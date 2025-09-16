@@ -1,18 +1,23 @@
 #!/usr/bin/env bash
 set -e
 
-# Load .env if it exists
-if [ -f .env ]; then
-    export $(grep -v '^#' .env | xargs)
+# Auto-install Poetry if missing (native host)
+if ! command -v poetry >/dev/null 2>&1; then
+    echo "Poetry not found. Installing..."
+    curl -sSL https://install.python-poetry.org | python3 -
+    export PATH="$HOME/.local/bin:$PATH"
 fi
 
-# Ensure script runs from the project root
+# Load .env if present
+[ -f .env ] && export $(grep -v '^#' .env | xargs)
+
+# Ensure project root
 cd "$(dirname "$0")"
 
-# Create db directory for SQLite persistence
+# Create SQLite db directory
 mkdir -p db
 
-# Default values if not defined in .env
+# Defaults
 FLASK_APP="${FLASK_APP:-app.py}"
 FLASK_ENV="${FLASK_ENV:-development}"
 FLASK_RUN_HOST="${FLASK_RUN_HOST:-0.0.0.0}"
@@ -24,36 +29,21 @@ DOCKER_PORT_MAPPING="${DOCKER_PORT_MAPPING:-$FLASK_RUN_PORT:$FLASK_RUN_PORT}"
 DOCKER_VOLUME_MAPPING="${DOCKER_VOLUME_MAPPING:-$(pwd)/db:/usr/src/app/db}"
 DOCKER_DETACHED="${DOCKER_DETACHED:-false}"
 
-# Function: run Flask natively
+# Run Flask natively via Poetry
 run_flask_natively() {
-    echo "Running Flask natively..."
-    export FLASK_APP FLASK_ENV FLASK_RUN_HOST FLASK_RUN_PORT
-    exec flask run
+    echo "Running Flask natively with Poetry..."
+    poetry run flask run --host "$FLASK_RUN_HOST" --port "$FLASK_RUN_PORT"
 }
 
-# Function: run Flask inside Docker
+# Run Flask inside Docker
 run_flask_in_docker() {
     echo "Docker detected! Running Flask inside Docker..."
-
-    # Build Docker image
     docker build -t "$DOCKER_IMAGE_NAME" .
-
-    # Prepare run options
     DOCKER_RUN_OPTS="-p $DOCKER_PORT_MAPPING -v $DOCKER_VOLUME_MAPPING --name $DOCKER_CONTAINER_NAME"
-    if [ "$DOCKER_DETACHED" = "true" ]; then
-        DOCKER_RUN_OPTS="$DOCKER_RUN_OPTS -d"
-    else
-        DOCKER_RUN_OPTS="$DOCKER_RUN_OPTS --rm -it"
-    fi
-
-    # Run container
+    [ "$DOCKER_DETACHED" = "true" ] && DOCKER_RUN_OPTS="$DOCKER_RUN_OPTS -d" || DOCKER_RUN_OPTS="$DOCKER_RUN_OPTS --rm -it"
     docker run $DOCKER_RUN_OPTS "$DOCKER_IMAGE_NAME"
 }
 
-# Main logic: detect Docker
-if command -v docker >/dev/null 2>&1; then
-    run_flask_in_docker
-else
-    run_flask_natively
-fi
+# Detect Docker
+command -v docker >/dev/null 2>&1 && run_flask_in_docker || run_flask_natively
 

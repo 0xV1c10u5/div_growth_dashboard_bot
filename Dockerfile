@@ -1,29 +1,29 @@
-# Use official Python image
 FROM python:3.12-slim
 
-# Prevent Python from writing pyc files and buffer output
-ENV PYTHONDONTWRITEBYTECODE=1
-ENV PYTHONUNBUFFERED=1
+# Install system dependencies for Poetry
+RUN apt-get update && apt-get install -y curl build-essential
 
-# Set working directory
+# Install Poetry
+ENV POETRY_HOME="/opt/poetry"
+ENV PATH="$POETRY_HOME/bin:$PATH"
+
+RUN curl -sSL https://install.python-poetry.org | python3 -
+
 WORKDIR /usr/src/app
 
-# Install dependencies
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
-
-# Copy application code and run script
+# Copy project files
+COPY pyproject.toml poetry.lock* ./
 COPY . .
 
-# Make sure run.sh is executable
+# Install dependencies with Poetry
+RUN poetry install --no-root --no-dev
+
+# Make run.sh executable
 RUN chmod +x run.sh
 
-# Expose Flask port
 EXPOSE 5000
-
-# Persist SQLite database
 VOLUME ["/usr/src/app/db"]
 
-# Use unified entry point
+# Unified entry point
 CMD ["./run.sh"]
 
