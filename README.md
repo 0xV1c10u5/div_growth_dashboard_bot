@@ -8,6 +8,7 @@ Automated Quant Focused on Dividend Growth Gordon Growth w/Dashboard, Scraper, a
 - <s>Embedded tableau/grafana? -- Dash/Plotly</s>
 - <s>Add graceful shutdown script</s>
 
+- Add Offline Sample Data Prepopulated and Stored in GH
 - Env file auto-creation/persistence
 - MVP Dividend Algo
 - Add Backtesting
