@@ -35,13 +35,13 @@ COPY --from=builder /usr/local/lib/python3.12/site-packages /usr/local/lib/pytho
 COPY --from=builder /usr/local/bin /usr/local/bin
 
 # Copy application code
-COPY app.py /app/
+COPY main.py /app/
 
 # Expose Dash port
 EXPOSE 8050
 
-# Run Gunicorn
-CMD ["gunicorn", "app:server", \
+# Run Gunicorn pointing to main.py
+CMD ["gunicorn", "main:server", \
      "--bind", "0.0.0.0:8050", \
      "--workers", "2", \
      "--threads", "4", \
